@@ -10,52 +10,41 @@ const LinkRedirect = () => {
 
   useEffect(() => {
     const fetchLinks = async () => {
-      try {
-        const db = getFirestore();
-        console.log('Fetching link for shortCode:', shortCode);
-        const linkRef = doc(db, 'links', shortCode);
-        const linkDoc = await getDoc(linkRef);
+        try {
+            const db = getFirestore();
+            console.log('Fetching link for shortCode:', shortCode);
+            const linkRef = doc(db, 'links', shortCode);
+            console.log('Link Document Reference:', linkRef.path);
+            
+            const linkDoc = await getDoc(linkRef);
 
-        if (linkDoc.exists()) {
-          const linkData = linkDoc.data();
-          console.log('Fetched document data:', linkData);
+            if (linkDoc.exists()) {
+                const linkData = linkDoc.data();
+                console.log('Fetched document data:', linkData);
+                
+                const { longURL } = linkData; // Extract longURL
 
-          // Validate fields and ensure they exist in the document
-          if (!linkData.longURL || !linkData.linkId || !linkData.userUid) {
-            console.error('Required fields are missing in the document:', {
-              longURL: linkData.longURL,
-              linkId: linkData.linkId,
-              userUid: linkData.userUid,
-            });
-            setErrorMessage('Required data fields are missing in the document.');
-            return;
-          }
-
-          const { longURL, linkId, userUid } = linkData;
-          const userLinkRef = doc(db, 'users', userUid, 'links', linkId);
-
-          // Increment the click count
-          await updateDoc(userLinkRef, {
-            totalClicks: increment(1),
-          });
-          console.log('Redirecting to:', longURL);
-
-          // Redirect to the long URL
-          window.location.replace(longURL);
-        } else {
-          console.error('Short URL not found in Firestore');
-          setErrorMessage('Short URL not found.');
+                // Update total clicks or redirect logic
+                const userLinkRef = doc(db, 'users', linkData.userUid, 'links', linkData.linkId);
+                await updateDoc(userLinkRef, {
+                    totalClicks: increment(1),
+                });
+                console.log('Redirecting to:', longURL);
+                window.location.replace(longURL);
+            } else {
+                console.error('Short URL not found');
+                setErrorMessage('Short URL not found');
+            }
+        } catch (error) {
+            console.error('Error fetching link:', error);
+            setErrorMessage('An error occurred while fetching the link');
+        } finally {
+            setLoading(false);
         }
-      } catch (error) {
-        console.error('Error fetching the link:', error);
-        setErrorMessage('An error occurred while fetching the link. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
     };
 
     fetchLinks();
-  }, [shortCode]);
+}, [shortCode]);
 
   if (loading) {
     return (
