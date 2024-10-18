@@ -17,6 +17,8 @@ const LinkRedirect = () => {
             console.log('Link Document Reference:', linkRef.path);
             
             const linkDoc = await getDoc(linkRef);
+          console.log('link data',linkDoc);
+          
 
             if (linkDoc.exists()) {
                 const linkData = linkDoc.data();
