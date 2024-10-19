@@ -13,7 +13,7 @@ const LinkRedirect = () => {
       try {
         const db = getFirestore(); // Initialize Firestore
         console.log('Fetching link for shortCode:', shortCode);
-        const linkRef = doc(db, 'links', shortCode); // Reference to the link document
+        const linkRef = doc(db, '/users/Ii6oIa2uTRaHwnQOGXU0jU3N4fS2/links', "SKr4pQ326EBDK0XHlpVL"); // Reference to the link document
         console.log('Link Document Reference:', linkRef.path);
 
         const linkDoc = await getDoc(linkRef); // Fetch the document
